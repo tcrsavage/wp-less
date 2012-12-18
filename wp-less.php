@@ -46,7 +46,7 @@ class wp_less {
 	 * May be used to access class methods from outside.
 	 *
 	 * @see    __construct()
-	 * @return void
+	 * @return wp_less
 	 */
 	public static function instance() {
 
