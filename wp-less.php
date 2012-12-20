@@ -137,6 +137,7 @@ class wp_less {
 				$less = new lessc( $less_path );
 				file_put_contents( $cache_path, serialize( array( 'vars' => $vars, 'less' => $less_cache ) ) );
 				file_put_contents( $css_path, $less->parse( null, $vars ) );
+				$less_cache[ 'updated' ] = time();
 			}
 		} catch ( exception $ex ) {
 			wp_die( $ex->getMessage() );
