@@ -135,9 +135,9 @@ class wp_less {
 			$less_cache = lessc :: cexecute( $full_cache[ 'less' ] );
 			if ( ! is_array( $less_cache ) || $less_cache[ 'updated' ] > $full_cache[ 'less' ][ 'updated' ] || $vars !== $full_cache[ 'vars' ] ) {
 				$less = new lessc( $less_path );
+				$less_cache[ 'updated' ] = time();
 				file_put_contents( $cache_path, serialize( array( 'vars' => $vars, 'less' => $less_cache ) ) );
 				file_put_contents( $css_path, $less->parse( null, $vars ) );
-				$less_cache[ 'updated' ] = time();
 			}
 		} catch ( exception $ex ) {
 			wp_die( $ex->getMessage() );
