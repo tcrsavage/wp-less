@@ -116,7 +116,7 @@ class wp_less {
 		list( $less_path, $query_string ) = explode( '?', str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $src ) );
 
 		// output css file name
-		$css_path = trailingslashit( $this->get_cache_dir() ) . "{$handle}.css";
+		$css_path = apply_filters( 'less_css_path', trailingslashit( $this->get_cache_dir() ) . "{$handle}.css", $handle );
 
 		// vars to pass into the compiler - default @themeurl var for image urls etc...
 		$vars = apply_filters( 'less_vars', array( 'themeurl' => '~"' . get_stylesheet_directory_uri() . '"' ), $handle );
@@ -143,7 +143,7 @@ class wp_less {
 		}
 
 		// return the compiled stylesheet with the query string it had if any
-		$url = trailingslashit( $this->get_cache_dir( false ) ) . "{$handle}.css" . ( ! empty( $query_string ) ? "?{$query_string}" : '' );
+		$url = apply_filters( 'less_css_url', trailingslashit( $this->get_cache_dir( false ) ) . "{$handle}.css" . ( ! empty( $query_string ) ? "?{$query_string}" : '' ), $handle );
 		return add_query_arg( 'ver', $less_cache[ 'updated' ], $url );
 	}
 
