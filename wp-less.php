@@ -119,7 +119,10 @@ class wp_less {
 		$css_path = apply_filters( 'less_css_path', trailingslashit( $this->get_cache_dir() ) . "{$handle}.css", $handle );
 
 		// vars to pass into the compiler - default @themeurl var for image urls etc...
-		$vars = apply_filters( 'less_vars', array( 'themeurl' => '~"' . get_stylesheet_directory_uri() . '"' ), $handle );
+		$vars = apply_filters( 'less_vars', array( 
+			'themeurl' => '~"' . get_stylesheet_directory_uri() . '"',
+			'templateurl' => '~"' . get_template_directory_uri() . '"' 
+		), $handle );
 
 		// automatically regenerate files if source's modified time has changed or vars have changed
 		try {
