@@ -128,8 +128,9 @@ class wp_less {
 		try {
 			// load the cache
 			$cache_path = "{$css_path}.cache";
-			if ( file_exists( $cache_path ) )
-				$full_cache = unserialize( file_get_contents( $cache_path ) );
+
+			if ( $this->is_file_cached( $handle ) )
+				$full_cache = $this->get_cached_file_data( $handle );
 
 			// If the root path in the cache is wrong then regenerate
 			if ( ! isset( $full_cache[ 'less' ][ 'root' ] ) || ! file_exists( $full_cache[ 'less' ][ 'root' ] ) )
@@ -138,20 +139,64 @@ class wp_less {
 			$less_cache = lessc :: cexecute( $full_cache[ 'less' ] );
 
 			if ( ! is_array( $less_cache ) || is_string( $full_cache[ 'less' ] ) || $full_cache[ 'less' ][ 'updated' ] && $less_cache[ 'updated' ] > $full_cache[ 'less' ][ 'updated' ] || $vars !== $full_cache[ 'vars' ] ) {
+
 				$less = new lessc( $less_path );
+
 				$less_cache[ 'updated' ] = time();
-				file_put_contents( $cache_path, serialize( array( 'vars' => $vars, 'less' => $less_cache ) ) );
-				file_put_contents( $css_path, $less->parse( null, $vars ) );
+
+				$this->update_cached_file_data( $handle, array( 'vars' => $vars, 'less' => $less_cache ) );
 			}
+
 		} catch ( exception $ex ) {
 			wp_die( $ex->getMessage() );
 		}
 
 		// return the compiled stylesheet with the query string it had if any
 		$url = apply_filters( 'less_css_url', trailingslashit( $this->get_cache_dir( false ) ) . "{$handle}.css" . ( ! empty( $query_string ) ? "?{$query_string}" : '' ), $handle );
+
 		return add_query_arg( 'ver', $less_cache[ 'updated' ], $url );
 	}
 
+	public function save_parsed_css( $css_path, $file_contents ) {
+
+		if ( ! apply_filters( 'less_save_css', $css_path, $file_contents ) )
+			return;
+
+		file_put_contents( $css_path, $file_contents );
+	}
+
+	/**
+	 * Check if we have parsed cache data for this file
+	 *
+	 * @param $path
+	 * @return bool
+	 */
+	public function is_file_cached( $path ) {
+
+		return ( $this->get_cached_file_data( $path ) );
+	}
+
+	/**
+	 * Update parsed cache data for this file
+	 *
+	 * @param $path
+	 * @param $file_data
+	 */
+	public function update_cached_file_data( $path, $file_data ) {
+
+		update_option( 'wp_less_cached_file_' . md5( $path ), $file_data );
+	}
+
+	/**
+	 * Update parsed cache data for this file
+	 *
+	 * @param $path
+	 * @return bool
+	 */
+	public function get_cached_file_data( $path ) {
+
+		return get_option(  'wp_less_cached_file_' . md5( $path ), array() );
+	}
 
 	/**
 	 * Compile editor stylesheets registered via add_editor_style()
