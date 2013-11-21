@@ -144,6 +144,8 @@ class wp_less {
 
 				$less_cache[ 'updated' ] = time();
 
+				$this->save_parsed_css( $css_path, $less->parse( null, $vars ) );
+
 				$this->update_cached_file_data( $handle, array( 'vars' => $vars, 'less' => $less_cache ) );
 			}
 
