@@ -186,7 +186,13 @@ class wp_less {
 	 */
 	public function update_cached_file_data( $path, $file_data ) {
 
-		update_option( 'wp_less_cached_file_' . md5( $path ), $file_data );
+		$file_data['less']['compiled'] = '';
+
+		$caches = get_option( 'wp_less_cached_files', array() );
+
+		$caches[$path] = $file_data;
+
+		update_option( 'wp_less_cached_files', $caches );
 	}
 
 	/**
@@ -197,7 +203,12 @@ class wp_less {
 	 */
 	public function get_cached_file_data( $path ) {
 
-		return get_option(  'wp_less_cached_file_' . md5( $path ), array() );
+		$caches = get_option( 'wp_less_cached_files', array() );
+
+		if ( isset( $caches[$path] ) )
+			return $caches[$path];
+
+		return null;
 	}
 
 	/**
@@ -259,8 +270,6 @@ class wp_less {
 		if ( $path ) {
 			$dir = apply_filters( 'wp_less_cache_path', trailingslashit( $upload_dir[ 'basedir' ] ) . 'wp-less-cache' );
 			// create folder if it doesn't exist yet
-			if ( ! file_exists( $dir ) )
-				wp_mkdir_p( $dir );
 		} else {
 			$dir = apply_filters( 'wp_less_cache_url', trailingslashit( $upload_dir[ 'baseurl' ] ) . 'wp-less-cache' );
 		}
