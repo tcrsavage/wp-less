@@ -142,6 +142,8 @@ class wp_less {
 
 				$less = new lessc( $less_path );
 
+				do_action( 'less_customize', $less );
+
 				$less_cache[ 'updated' ] = time();
 
 				$this->save_parsed_css( $css_path, $less->parse( null, $vars ) );
